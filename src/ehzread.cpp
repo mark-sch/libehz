@@ -2,6 +2,7 @@
  * This file is part of libehz.
  *
  * (c) Mathias Dalheimer <md@gonium.net>, 2010
+ * (c) Mark Schmalohr <ms@think5.de>, 2013
  *
  * libehz is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +24,7 @@
 #include <cstring>
 #include <fcntl.h>
 #include <termios.h>
+#include <sys/ioctl.h>
 
 int main(int argc,char** argv) {
   struct termios tio;
@@ -47,6 +49,12 @@ int main(int argc,char** argv) {
   cfsetispeed(&tio,B9600);			// 9600 baud
 
   tcsetattr(tty_fd,TCSANOW,&tio);
+
+  int iFlags;
+  // turn on DTR
+  iFlags = TIOCM_DTR;
+  ioctl(tty_fd, TIOCMBIS, &iFlags);
+
   while (true) {
     if (read(tty_fd,&c,1)>0) 
       // if new data is available on the serial port, print it out
